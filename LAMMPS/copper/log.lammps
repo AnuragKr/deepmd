@@ -1,0 +1,140 @@
+LAMMPS (23 Jun 2022)
+  using 6 OpenMP thread(s) per MPI task
+Loaded 1 plugins from /home/anurag1/miniconda3/envs/deepmd/lib/deepmd_lmp
+Loaded 1 plugins from /home/anurag1/miniconda3/envs/deepmd/lib/deepmd_lmp
+
+variable        x index 1
+variable        y index 1
+variable        z index 1
+
+variable        xx equal 20*5
+variable        yy equal 20*5
+variable        zz equal 20*5
+
+units           metal
+dimension       3
+boundary        p p p
+atom_style      atomic
+
+variable latparam equal 3.61
+variable material string Cu
+
+lattice         fcc ${latparam}
+lattice         fcc 3.61
+Lattice spacing in x,y,z = 3.61 3.61 3.61
+region          box block 0 ${xx} 0 ${yy} 0 ${zz}
+region          box block 0 100 0 ${yy} 0 ${zz}
+region          box block 0 100 0 100 0 ${zz}
+region          box block 0 100 0 100 0 100
+create_box      1 box
+Created orthogonal box = (0 0 0) to (361 361 361)
+  1 by 1 by 1 MPI processor grid
+create_atoms    1 random 100000 123456 box
+Created 100000 atoms
+  using lattice units in orthogonal box = (0 0 0) to (361 361 361)
+  create_atoms CPU = 0.030 seconds
+mass            1 63.546
+
+reset_timestep  0
+timestep 0.0005
+velocity        all create 300 87287 loop geom
+
+#neighbor	1.0 bin
+#neigh_modify    delay 5 every 1
+
+pair_style deepmd copper_single_gpu_graph-compress.pb
+Summary of lammps deepmd module ...
+  >>> Info of deepmd-kit:
+  installed to:       /home/anurag1/miniconda3/envs/deepmd
+  source:             v2.1.3
+  source branch:       HEAD
+  source commit:      5a32c49e
+  source commit at:   2022-07-01 09:52:58 +0800
+  surpport model ver.:1.1 
+  build float prec:   double
+  build with tf inc:  /home/anurag1/miniconda3/envs/deepmd/include;/home/anurag1/miniconda3/envs/deepmd/include
+  build with tf lib:  /home/anurag1/miniconda3/envs/deepmd/lib/libtensorflow_cc.so;/home/anurag1/miniconda3/envs/deepmd/lib/libtensorflow_framework.so
+  set tf intra_op_parallelism_threads: 1
+  set tf inter_op_parallelism_threads: 1
+  >>> Info of lammps module:
+  use deepmd-kit at:  /home/anurag1/miniconda3/envs/deepmdpair_coeff * *
+
+
+neighbor        0.3 bin
+neigh_modify    delay 0 every 20 check no
+
+fix             1 all nve
+
+# Set thermo output
+thermo 100
+thermo_style custom step lx ly lz press pxx pyy pzz pe temp
+
+run             100
+
+CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE
+
+Your simulation uses code contributions which should be cited:
+
+- USER-DEEPMD package:
+
+@article{Wang_ComputPhysCommun_2018_v228_p178,
+  author = {Wang, Han and Zhang, Linfeng and Han, Jiequn and E, Weinan},
+  doi = {10.1016/j.cpc.2018.03.016},
+  url = {https://doi.org/10.1016/j.cpc.2018.03.016},
+  year = 2018,
+  month = {jul},
+  publisher = {Elsevier {BV}},
+  volume = 228,
+  journal = {Comput. Phys. Commun.},
+  title = {{DeePMD-kit: A deep learning package for many-body potential energy representation and molecular dynamics}},
+  pages = {178--184}
+}
+
+CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE
+
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update every 20 steps, delay 0 steps, check no
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 6.3
+  ghost atom cutoff = 6.3
+  binsize = 3.15, bins = 115 115 115
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair deepmd, perpetual
+      attributes: full, newton on
+      pair build: full/bin/atomonly
+      stencil: full/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 43.18 | 43.18 | 43.18 Mbytes
+   Step           Lx             Ly             Lz           Press           Pxx            Pyy            Pzz           PotEng          Temp     
+         0   361            361            361            161.11413      156.0533       161.53213      165.75695     -53390.903      300          
+       100   361            361            361           -16.138572      2.9798382     -34.498387     -16.897168     -69917.388      1797.9591    
+Loop time of 62.8461 on 6 procs for 100 steps with 100000 atoms
+
+Performance: 0.069 ns/day, 349.145 hours/ns, 1.591 timesteps/s
+104.8% CPU use with 1 MPI tasks x 6 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 62.044     | 62.044     | 62.044     |   0.0 | 98.72
+Neigh   | 0.39013    | 0.39013    | 0.39013    |   0.0 |  0.62
+Comm    | 0.055066   | 0.055066   | 0.055066   |   0.0 |  0.09
+Output  | 0.0041804  | 0.0041804  | 0.0041804  |   0.0 |  0.01
+Modify  | 0.31878    | 0.31878    | 0.31878    |   0.0 |  0.51
+Other   |            | 0.03354    |            |       |  0.05
+
+Nlocal:         100000 ave      100000 max      100000 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          10749 ave       10749 max       10749 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:              0 ave           0 max           0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+FullNghs:       222806 ave      222806 max      222806 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 222806
+Ave neighs/atom = 2.22806
+Neighbor list builds = 5
+Dangerous builds not checked
+Total wall time: 0:01:20
