@@ -120,16 +120,27 @@ def get_systems(path):
 
 if __name__ == '__main__':
     import dpdata
-    systems = get_systems('../../../../data/water/ice_pimd/')
+    systems = get_systems('../../data/water/ice_triple_II/train')
     weights = []
     rdf_list = []
+    frames = []
+    atoms = []
+    count = 0
+    total_frames = 0
     for sys in systems:
         coord_dim = sys['coords'].shape
         frame_num = coord_dim[0]
         atom_num = coord_dim[1]
+        total_frames += int(frame_num)
+        """frames.append(frame_num)
+        atoms.append(atom_num)
         weights.append(frame_num*atom_num)
-        xx,rdf_values,_ = rdf(sys, sel_type = [0,1], max_r = 6, nbins = 100)
+        count += 1
+        print(f'System-{count} started')
+        xx,rdf_values,_ = rdf(sys, sel_type = [0,0], max_r = 6, nbins = 100)
         rdf_list.append(rdf_values)
-    rdf = np.average(rdf_list, axis=0, weights=weights)
-    res = np.concatenate([xx, rdf]).reshape([2, -1])
-    np.savetxt('rdf_OH.out', res.T)
+        print(f'System-{count} finished.')"""
+    #rdf = np.average(rdf_list, axis=0, weights=weights)
+    #res = np.concatenate([xx, rdf]).reshape([2, -1])
+    #np.savetxt('rdf_OO.out', res.T)
+    print(total_frames)
