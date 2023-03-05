@@ -1,0 +1,47 @@
+# bulk water
+units metal
+atom_style atomic
+boundary p p p
+read_data ice.lmp
+
+
+neighbor        2.0 bin
+neigh_modify    every 1 delay 0 check yes
+
+mass 1 16 # O
+mass 2 1 # H
+
+pair_style deepmd ../graph.pb
+pair_coeff * *
+
+timestep 0.00048
+
+group Oatoms type 1
+group Hatoms type 2
+
+fix 1 all npt temp 238.0 238.0 0.0048 iso 2130 2130 0.048
+
+velocity all create 238.0 2302
+
+#fix             1 all nvt temp 238.0 238.0 0.048
+
+thermo_style custom step temp ke pe etotal press vol
+thermo 100
+thermo_modify format line "%d %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e"
+
+dump my_dump all custom 100 h2o.xyz id type x y z vx vy vz
+dump_modify my_dump sort id
+dump my_dump2 all atom 100 water.lammps-dump-text
+
+compute myRDF all rdf 100 1 1 1 2 2 2 
+fix 2 all ave/time 100 1 100 c_myRDF[*] file h2o.rdf mode vector ave running
+
+compute msd_O Oatoms msd
+compute msd_H Hatoms msd
+fix store_msd_O all vector 10 c_msd_O[4]
+fix store_msd_H all vector 10 c_msd_H[4]
+variable fitslope_O equal slope(f_store_msd_O)/6/(10*dt)
+variable fitslope_H equal slope(f_store_msd_H)/6/(10*dt)
+fix 3 all ave/time 100 1 100 c_msd_O[4] c_msd_H[4] v_fitslope_O v_fitslope_H file diffusion.txt
+
+run 625000
